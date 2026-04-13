@@ -1,0 +1,55 @@
+name: Unity WebGL Build & Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 拉取代码（含 LFS 文件）
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      # 2. 缓存 Unity 库文件，极大加速后续构建
+      - uses: actions/cache@v4
+        with:
+          path: |
+            Library
+            Temp
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+
+      # 3. 激活 Unity 并构建 WebGL（使用个人许可证）
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          unityVersion: 2022.3.62f3c1
+          targetPlatform: WebGL
+
+      # 4. 上传构建结果供部署任务使用
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WebGLBuild
+          path: build/WebGL
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # 5. 下载构建产物
+      - uses: actions/download-artifact@v4
+        with:
+          name: WebGLBuild
+          path: WebGLBuild
+
+      # 6. 部署到 GitHub Pages
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: WebGLBuild
