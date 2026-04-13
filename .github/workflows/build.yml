@@ -29,7 +29,7 @@ jobs:
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
-          unityVersion: 2022.3.62f3c1
+          unityVersion: 2022.3.62f1
           targetPlatform: WebGL
 
       # 4. 上传构建结果供部署任务使用
