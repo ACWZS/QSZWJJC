@@ -25,13 +25,15 @@ jobs:
             Library-
 
       # 3. 激活 Unity 并构建 WebGL（使用个人许可证）
-      - uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-        with:
-          unityVersion: 2022.3.62f3c1
-          targetPlatform: WebGL
+- name: Check image availability (optional but recommended)
+  run: docker pull unityci/editor:ubuntu-2022.3.62f3c1-webgl-1 || echo "镜像不存在"
 
+- uses: game-ci/unity-builder@v4
+  env:
+    UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  with:
+    customImage: unityci/editor:ubuntu-2022.3.62f3c1-webgl-1
+    targetPlatform: WebGL
       # 4. 上传构建结果供部署任务使用
       - uses: actions/upload-artifact@v4
         with:
