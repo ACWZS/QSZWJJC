@@ -1,0 +1,21 @@
+# Unity
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+
+# Visual Studio 项目文件（会自动生成，无需上传）
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+
+# 操作系统
+.DS_Store
+Thumbs.db
