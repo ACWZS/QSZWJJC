@@ -1,0 +1,57 @@
+name: Tuanjie WebGL Build & Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    # 关键：指定团结引擎官方提供的运行环境
+    # 参考：https://devops.unity.cn/help/docs/reference/config
+    runs-on: windows-server-2022-tuanjie-1.1.0-pc-8c-16g[reference:0][reference:1]
+    steps:
+      # 1. 拉取代码（含 LFS 文件）
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      # 2. 缓存 Library 目录，加速后续构建
+      # 注：团结引擎官方也提供了 tj-cache，但 GitHub 原生的 actions/cache 同样有效
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Tuanjie-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Tuanjie-
+
+      # 3. 使用团结引擎官方 Action 构建 WebGL
+      - name: Build WebGL with Tuanjie
+        uses: actions/tj-builder@v3
+        with:
+          targetPlatform: WebGL          # 指定平台
+          projectPath: .                 # 项目路径，`.` 代表仓库根目录
+          buildName: WebGL               # 构建输出名
+          buildsPath: build/WebGL        # 构建输出路径，与之前保持一致
+
+      # 4. 上传构建结果供部署任务使用
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WebGLBuild
+          path: build/WebGL
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      # 5. 下载构建产物
+      - uses: actions/download-artifact@v4
+        with:
+          name: WebGLBuild
+          path: WebGLBuild
+
+      # 6. 部署到 GitHub Pages
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: WebGLBuild
