@@ -9,7 +9,7 @@ jobs:
   build:
     # 关键：指定团结引擎官方提供的运行环境
     # 参考：https://devops.unity.cn/help/docs/reference/config
-    runs-on: windows-server-2022-tuanjie-1.1.0-pc-8c-16g[reference:0][reference:1]
+    runs-on: windows-server-2022-tuanjie-1.1.0-pc-8c-16g
     steps:
       # 1. 拉取代码（含 LFS 文件）
       - uses: actions/checkout@v4
