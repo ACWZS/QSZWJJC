@@ -1,0 +1,20 @@
+name: Get Unity License File
+on:
+  workflow_dispatch: {}
+jobs:
+  request-activation-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request manual activation file
+        id: getManualLicenseFile
+        uses: game-ci/unity-builder@v4
+        with:
+          unityVersion: 2022.3.62f1
+          targetPlatform: WebGL
+          activate: true                          # 关键参数：只激活不构建
+      
+      - name: Upload activation file
+        uses: actions/upload-artifact@v4
+        with:
+          name: UnityActivationFile
+          path: ${{ steps.getManualLicenseFile.outputs.activationFile }}
