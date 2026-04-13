@@ -8,12 +8,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 关键：移除无效的 'unityVersion' 和 'targetPlatform' 输入
+      # 并提供邮箱和密码作为环境变量
       - name: Request manual activation file
         id: activation
         uses: game-ci/unity-activate@v1
-        with:
-          unityVersion: 2022.3.62f1
-          targetPlatform: WebGL
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
 
       - name: Upload activation file
         uses: actions/upload-artifact@v4
