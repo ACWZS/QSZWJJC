@@ -14,7 +14,7 @@ jobs:
         with:
           lfs: true
 
-      # 2. 缓存 Unity 库文件，极大加速后续构建
+      # 2. 缓存 Unity 库文件
       - uses: actions/cache@v4
         with:
           path: |
@@ -24,17 +24,19 @@ jobs:
           restore-keys: |
             Library-
 
-      # 3. 激活 Unity 并构建 WebGL（使用个人许可证）
-- name: Check image availability (optional but recommended)
-  run: docker pull unityci/editor:ubuntu-2022.3.62f3c1-webgl-1 || echo "镜像不存在"
+      # 3. （可选）检查中国版镜像是否存在
+      - name: Check image availability
+        run: docker pull unityci/editor:ubuntu-2022.3.62f3c1-webgl-1 || echo "镜像不存在，构建将失败"
 
-- uses: game-ci/unity-builder@v4
-  env:
-    UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-  with:
-    customImage: unityci/editor:ubuntu-2022.3.62f3c1-webgl-1
-    targetPlatform: WebGL
-      # 4. 上传构建结果供部署任务使用
+      # 4. 构建 WebGL
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          customImage: unityci/editor:ubuntu-2022.3.62f3c1-webgl-1
+          targetPlatform: WebGL
+
+      # 5. 上传构建结果
       - uses: actions/upload-artifact@v4
         with:
           name: WebGLBuild
@@ -44,13 +46,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      # 5. 下载构建产物
+      # 6. 下载构建产物
       - uses: actions/download-artifact@v4
         with:
           name: WebGLBuild
           path: WebGLBuild
 
-      # 6. 部署到 GitHub Pages
+      # 7. 部署到 GitHub Pages
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
