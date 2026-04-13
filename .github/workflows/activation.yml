@@ -5,16 +5,18 @@ jobs:
   request-activation-file:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Request manual activation file
-        id: getManualLicenseFile
-        uses: game-ci/unity-builder@v4
+        id: activation
+        uses: game-ci/unity-activate@v1
         with:
           unityVersion: 2022.3.62f1
           targetPlatform: WebGL
-          activate: true                          # 关键参数：只激活不构建
-      
+
       - name: Upload activation file
         uses: actions/upload-artifact@v4
         with:
           name: UnityActivationFile
-          path: ${{ steps.getManualLicenseFile.outputs.activationFile }}
+          path: ${{ steps.activation.outputs.activationFile }}
